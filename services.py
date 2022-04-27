@@ -6,6 +6,8 @@ from dateutil.parser import parse
 
 
 class DailyLogRow:
+    person = None
+
     def __init__(self, row, date):
         self.row = row
         self.start_time = None
@@ -14,11 +16,10 @@ class DailyLogRow:
         self.status = 'DONE'
         self.date = self._parse_date(date)
         self.day = None
-        self.person = None
 
     def parse(self):
         columns = self.row.split(',')
-        persons = None
+        persons = ''
         start_time = None
         description = None
 
@@ -33,6 +34,7 @@ class DailyLogRow:
         self.description = description.strip()
 
         self.day = calendar.day_abbr[self.date.weekday()]
+        self.person = self._get_person(persons)
 
     @classmethod
     def _get_category(cls, description):
@@ -58,6 +60,16 @@ class DailyLogRow:
 
         duration = self.end_time - self.start_time
         return duration.seconds / 3600
+
+    def _get_person(self, persons: str):
+        if persons == '':
+            return self.person
+        persons = f'{self.person} {persons}'.split(' ')
+        return ', '.join(persons)
+
+
+class FlashDailyLogRow(DailyLogRow):
+    person = 'Flash'
 
 
 class DailyLog:

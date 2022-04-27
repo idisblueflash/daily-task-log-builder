@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 import pytest
 
-from services import DailyLogRow, DailyLog
+from services import DailyLogRow, DailyLog, FlashDailyLogRow
 
 
 class TestDailyLogRow:
@@ -58,6 +58,18 @@ class TestDailyLogRow:
         row.parse()
         row.end_time = timedelta(hours=10)
         assert row._get_duration() == 2.5
+
+    def test_get_default_person(self):
+        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        assert row._get_person('') == 'Flash'
+
+    def test_get_person_with_one(self):
+        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        assert row._get_person('Serge') == 'Flash, Serge'
+
+    def test_get_person_with_more(self):
+        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        assert row._get_person('Serge Kimi') == 'Flash, Serge, Kimi'
 
 
 class TestDailyLog:
