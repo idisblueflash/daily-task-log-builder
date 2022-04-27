@@ -34,7 +34,7 @@ class DailyLogRow:
         hour, minute = start_time.split(':')
         self.start_time = timedelta(hours=int(hour), minutes=int(minute))
 
-        self.description = description.strip()
+        self.description = self._get_description(description.strip())
 
         self.day = calendar.day_abbr[parse(self.date).weekday()]
         self.persons = self._get_person(persons)
@@ -88,6 +88,14 @@ class DailyLogRow:
     @classmethod
     def _get_priority(cls, description):
         raise NotImplementedError
+
+    def _get_description(self, data):
+        if ':' not in data:
+            return data
+        main, sub_line_data = data.split(':')
+        sub_lines = [line.strip() for line in sub_line_data.split('*')]
+        result = f'{main}' + '\n  * ' + '\n  * '.join([line for line in sub_lines if line != ''])
+        return result
 
 
 class FlashDailyLogRow(DailyLogRow):
@@ -153,6 +161,8 @@ class DailyLog:
             column_width = max(df[column].astype(str).map(len).max(), len(column))
             column_index = df.columns.get_loc(column) + 1
             worksheet = writer.sheets['Daily Task Log']
+            if column_index == 7:
+                column_width = column_width // 2
             worksheet.set_column(column_index, column_index, column_width)
 
         writer.save()

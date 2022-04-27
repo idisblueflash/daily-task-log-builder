@@ -6,6 +6,7 @@ from services import DailyLogRow, DailyLog, FlashDailyLogRow, FlashDailyLog
 
 class TestDailyLogRow:
     ROW_DATA = '7:30, AI recommendation investigate on Kourosh'
+    SUBLINE_ROW_DATA = '7:30, AI recommendation investigate on Kourosh: * foo * bar'
     STATUS_ROW_DATA = '7:30, AI recommendation investigate on Kourosh, Serge'
     DATE = '25/Apr/22'
 
@@ -21,6 +22,11 @@ class TestDailyLogRow:
     def test_parse_description(self):
         row = self.get_service()
         assert row.description == 'AI recommendation investigate on Kourosh'
+
+    def test_parse_description_with_sublines(self):
+        service = FlashDailyLogRow(self.SUBLINE_ROW_DATA, self.DATE)
+        service.parse()
+        assert service.description == 'AI recommendation investigate on Kourosh\n  * foo\n  * bar'
 
     def test_parse_default_status(self):
         row = self.get_service()
@@ -43,7 +49,7 @@ class TestDailyLogRow:
 
     def test_get_date(self):
         row = self.get_service()
-        assert row.date == datetime(2022, 4, 25)
+        assert row.date == '25/Apr/22'
 
     def test_get_day(self):
         row = self.get_service()
