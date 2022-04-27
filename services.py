@@ -64,7 +64,7 @@ class DailyLogRow:
             return 0
 
         duration = self.end_time - self.start_time
-        return duration.seconds / 3600
+        return round(duration.seconds / 3600, 2)
 
     def _get_person(self, persons: str):
         persons = persons.strip()
@@ -98,6 +98,7 @@ class FlashDailyLogRow(DailyLogRow):
             'ai recom': 'High',
             'devops': 'Medium',
             'daily': 'Low',
+            'break': 'Low'
         }
 
         for key, value in mapping.items():

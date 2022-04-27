@@ -57,6 +57,11 @@ class TestDailyLogRow:
         row.end_time = timedelta(hours=10)
         assert row._get_duration() == 2.5
 
+    def test_get_duration_with_round(self):
+        row = self.get_service()
+        row.end_time = timedelta(hours=8, minutes=19)
+        assert row._get_duration() == 0.82
+
     def test_get_default_person(self):
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('') == 'Flash'
@@ -89,7 +94,8 @@ class TestDailyLogRow:
         ('Email Status Test & communication', 'Medium'),
         ('Pairing on Other Source Setting up', 'Medium'),
         ('New Feature on Center discussing', 'Medium'),
-        ('Compose daily Report', 'Low')
+        ('Compose daily Report', 'Low'),
+        ('break', 'Low')
 
     ])
     def test_get_priority(self, test_input, expected):
