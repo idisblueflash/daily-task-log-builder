@@ -78,9 +78,27 @@ class DailyLogRow:
         digits = str(time).split(':')
         return ':'.join(digits[:2])
 
+    @classmethod
+    def _get_priority(cls, description):
+        raise NotImplementedError
+
 
 class FlashDailyLogRow(DailyLogRow):
     person = 'Flash'
+
+
+    @classmethod
+    def _get_priority(cls, description):
+        mapping = {
+            'ai recom': 'High',
+            'devops': 'Medium',
+            'daily': 'Low',
+        }
+
+        for key, value in mapping.items():
+            if key in description.lower():
+                return value
+        return 'Medium'
 
 
 class DailyLog:

@@ -82,6 +82,20 @@ class TestDailyLogRow:
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('Serge Kimi') == 'Flash, Serge, Kimi'
 
+    @pytest.mark.parametrize('test_input, expected', [
+        ('AI recommendation investigate on Kourosh', 'High'),
+        ('DevOps Daily Meeting', 'Medium'),
+        ('Discuss on Source collection', 'Medium'),
+        ('Email Status Test & communication', 'Medium'),
+        ('Pairing on Other Source Setting up', 'Medium'),
+        ('New Feature on Center discussing', 'Medium'),
+        ('Compose daily Report', 'Low')
+
+    ])
+    def test_get_priority(self, test_input, expected):
+        result = FlashDailyLogRow._get_priority(test_input)
+        assert result == expected
+
 
 class TestDailyLog:
     def get_service(self):
