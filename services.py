@@ -49,7 +49,8 @@ class DailyLogRow:
             'communicat': 'Communication',
             'discus': 'Discussion',
             'pair': 'Pairing',
-            'daily': 'Daily Works'
+            'daily': 'Daily Works',
+            'break': 'Break',
         }  # the order of key-value matters, the higher the first selected out
 
         for key, value in mapping.items():
@@ -124,6 +125,8 @@ class DailyLog:
                 past_log.end_time = current_log.start_time
             past_log = current_log
             self.logs.append(past_log)
+
+        self.logs = [log for log in self.logs if log.category != 'Break']
 
     def report(self):
         headers = ['Date', 'Day', 'Persons Involved',

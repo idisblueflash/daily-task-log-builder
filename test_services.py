@@ -33,7 +33,8 @@ class TestDailyLogRow:
         ('Email Status Test & communication', 'Communication'),
         ('Pairing on Other Source Setting up', 'Pairing'),
         ('New Feature on Center discussing', 'Discussion'),
-        ('Compose daily Report', 'Daily Works')
+        ('Compose daily Report', 'Daily Works'),
+        ('take a break', 'Break')
 
     ])
     def test_get_category(self, test_input, expected):
@@ -114,6 +115,11 @@ class TestDailyLog:
         service = self.get_service()
         service.handle()
         assert service.logs[0].end_time == timedelta(hours=10)
+
+    def test_remove_break_category(self):
+        service = self.get_service()
+        service.handle()
+        assert len(service.logs) == 2
 
     def test_report(self):
         service = self.get_service()
