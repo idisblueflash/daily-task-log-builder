@@ -3,12 +3,15 @@ from datetime import timedelta
 from typing import List
 
 from dateutil.parser import parse
+from tabulate import tabulate
 
 
 class DailyLogRow:
     person = None
 
     def __init__(self, row, date):
+        self.priority = None
+        self.category = None
         self.row = row
         self.start_time = None
         self.end_time = None
@@ -34,7 +37,9 @@ class DailyLogRow:
         self.description = description.strip()
 
         self.day = calendar.day_abbr[self.date.weekday()]
-        self.person = self._get_person(persons)
+        self.persons = self._get_person(persons)
+        self.category = self._get_category(self.description)
+        self.priority = self._get_priority(self.description)
 
     @classmethod
     def _get_category(cls, description):
@@ -62,10 +67,11 @@ class DailyLogRow:
         return duration.seconds / 3600
 
     def _get_person(self, persons: str):
+        persons = persons.strip()
         if persons == '':
             return self.person
-        persons = f'{self.person} {persons}'.split(' ')
-        return ', '.join(persons)
+        people = f'{self.person} {persons}'.split(' ')
+        return ', '.join(people)
 
     def _get_time(self):
         if self.end_time is None:
@@ -86,7 +92,6 @@ class DailyLogRow:
 class FlashDailyLogRow(DailyLogRow):
     person = 'Flash'
 
-
     @classmethod
     def _get_priority(cls, description):
         mapping = {
@@ -102,6 +107,8 @@ class FlashDailyLogRow(DailyLogRow):
 
 
 class DailyLog:
+    log_class = None
+
     def __init__(self, date: str, rows: List[str]):
         self.date = date
         self.rows = rows
@@ -110,9 +117,24 @@ class DailyLog:
     def handle(self):
         past_log = None
         for row in self.rows:
-            current_log = DailyLogRow(row, '31/Dec/19')
+            current_log = self.log_class(row, self.date)
             current_log.parse()
             if past_log:
                 past_log.end_time = current_log.start_time
             past_log = current_log
             self.logs.append(past_log)
+
+    def report(self):
+        headers = ['Date', 'Day', 'Persons Involved',
+                   'Time', 'Category', 'Priority', 'Description',
+                   'Estimate Hours', 'Total Hours', 'Status']
+        table = [[log.date, log.day, log.persons,
+                  log._get_time(), log.category, log.priority, log.description,
+                  log._get_duration(), 0, log.status]
+                 for log in self.logs]
+        print('')
+        print(tabulate(table, headers=headers))
+
+
+class FlashDailyLog(DailyLog):
+    log_class = FlashDailyLogRow

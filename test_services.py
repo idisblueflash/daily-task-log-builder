@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 import pytest
 
-from services import DailyLogRow, DailyLog, FlashDailyLogRow
+from services import DailyLogRow, DailyLog, FlashDailyLogRow, FlashDailyLog
 
 
 class TestDailyLogRow:
@@ -9,19 +9,21 @@ class TestDailyLogRow:
     STATUS_ROW_DATA = '7:30, AI recommendation investigate on Kourosh, Serge'
     DATE = '25/Apr/22'
 
+    def get_service(self):
+        service = FlashDailyLogRow(self.ROW_DATA, self.DATE)
+        service.parse()
+        return service
+
     def test_parse_time(self):
-        row = DailyLogRow(self.ROW_DATA, self.DATE)
-        row.parse()
+        row = self.get_service()
         assert row.start_time == timedelta(hours=7, minutes=30)
 
     def test_parse_description(self):
-        row = DailyLogRow(self.ROW_DATA, self.DATE)
-        row.parse()
+        row = self.get_service()
         assert row.description == 'AI recommendation investigate on Kourosh'
 
     def test_parse_default_status(self):
-        row = DailyLogRow(self.ROW_DATA, self.DATE)
-        row.parse()
+        row = self.get_service()
         assert row.status == 'DONE'
 
     @pytest.mark.parametrize('test_input, expected', [
@@ -39,23 +41,19 @@ class TestDailyLogRow:
         assert result == expected
 
     def test_get_date(self):
-        row = DailyLogRow(self.ROW_DATA, self.DATE)
-        row.parse()
+        row = self.get_service()
         assert row.date == datetime(2022, 4, 25)
 
     def test_get_day(self):
-        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
-        row.parse()
-        assert row.day == 'Tue'
+        row = self.get_service()
+        assert row.day == 'Mon'
 
     def test_get_default_duration(self):
-        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
-        row.parse()
+        row = self.get_service()
         assert row._get_duration() == 0
 
     def test_get_duration(self):
-        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
-        row.parse()
+        row = self.get_service()
         row.end_time = timedelta(hours=10)
         assert row._get_duration() == 2.5
 
@@ -64,19 +62,21 @@ class TestDailyLogRow:
         assert row._get_person('') == 'Flash'
 
     def test_get_default_time(self):
-        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
-        row.parse()
+        row = self.get_service()
         assert row._get_time() == '7:30 - ?'
 
     def test_get_time(self):
-        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
-        row.parse()
+        row = self.get_service()
         row.end_time = timedelta(hours=10)
         assert row._get_time() == '7:30 - 10:00'
 
     def test_get_person_with_one(self):
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('Serge') == 'Flash, Serge'
+
+    def test_get_person_with_one_and_space(self):
+        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        assert row._get_person(' Serge') == 'Flash, Serge'
 
     def test_get_person_with_more(self):
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
@@ -100,10 +100,16 @@ class TestDailyLogRow:
 class TestDailyLog:
     def get_service(self):
         data = ['7:30, AI recommendation investigate on Kourosh',
-                '10:00, DevOps Daily Meeting, done']
-        return DailyLog('24/Apr/22', data)
+                '10:00, DevOps Daily Meeting, Serge',
+                '12:00, break']
+        return FlashDailyLog('26/Apr/22', data)
 
     def test_set_end_time(self):
         service = self.get_service()
         service.handle()
         assert service.logs[0].end_time == timedelta(hours=10)
+
+    def test_report(self):
+        service = self.get_service()
+        service.handle()
+        service.report()
