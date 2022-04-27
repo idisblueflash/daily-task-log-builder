@@ -112,6 +112,7 @@ class DailyLog:
     log_class = None
 
     def __init__(self, date: str, rows: List[str]):
+        self.total_hours = 0
         self.date = date
         self.rows = rows
         self.logs = []
@@ -128,13 +129,18 @@ class DailyLog:
 
         self.logs = [log for log in self.logs if log.category != 'Break']
 
+    def _get_total_hours(self, hours):
+        self.total_hours += hours
+        return self.total_hours
+
+
     def report(self):
         headers = ['Date', 'Day', 'Persons Involved',
                    'Time', 'Category', 'Priority', 'Description',
                    'Estimate Hours', 'Total Hours', 'Status']
         table = [[log.date, log.day, log.persons,
                   log._get_time(), log.category, log.priority, log.description,
-                  log._get_duration(), 0, log.status]
+                  log._get_duration(), self._get_total_hours(log._get_duration()), log.status]
                  for log in self.logs]
         print('')
         print(tabulate(table, headers=headers))
