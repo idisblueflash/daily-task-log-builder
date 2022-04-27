@@ -1,7 +1,6 @@
 from datetime import timedelta, datetime
 import pytest
 
-
 from services import DailyLogRow, DailyLog
 
 
@@ -22,11 +21,6 @@ class TestDailyLogRow:
 
     def test_parse_default_status(self):
         row = DailyLogRow(self.ROW_DATA, self.DATE)
-        row.parse()
-        assert row.status == 'DONE'
-
-    def test_parse_status(self):
-        row = DailyLogRow(self.STATUS_ROW_DATA, self.DATE)
         row.parse()
         assert row.status == 'DONE'
 
@@ -54,6 +48,17 @@ class TestDailyLogRow:
         row.parse()
         assert row.day == 'Tue'
 
+    def test_get_default_duration(self):
+        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row.parse()
+        assert row._get_duration() == 0
+
+    def test_get_duration(self):
+        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row.parse()
+        row.end_time = timedelta(hours=10)
+        assert row._get_duration() == 2.5
+
 
 class TestDailyLog:
     def get_service(self):
@@ -61,3 +66,7 @@ class TestDailyLog:
                 '10:00, DevOps Daily Meeting, done']
         return DailyLog('24/Apr/22', data)
 
+    def test_set_end_time(self):
+        service = self.get_service()
+        service.handle()
+        assert service.logs[0].end_time == timedelta(hours=10)

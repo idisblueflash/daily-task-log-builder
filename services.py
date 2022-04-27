@@ -9,10 +9,12 @@ class DailyLogRow:
     def __init__(self, row, date):
         self.row = row
         self.start_time = None
+        self.end_time = None
         self.description = None
         self.status = 'DONE'
         self.date = self._parse_date(date)
         self.day = None
+        self.person = None
 
     def parse(self):
         columns = self.row.split(',')
@@ -50,8 +52,26 @@ class DailyLogRow:
     def _parse_date(self, date):
         return parse(date)
 
+    def _get_duration(self):
+        if self.end_time is None:
+            return 0
+
+        duration = self.end_time - self.start_time
+        return duration.seconds / 3600
+
 
 class DailyLog:
     def __init__(self, date: str, rows: List[str]):
         self.date = date
         self.rows = rows
+        self.logs = []
+
+    def handle(self):
+        past_log = None
+        for row in self.rows:
+            current_log = DailyLogRow(row, '31/Dec/19')
+            current_log.parse()
+            if past_log:
+                past_log.end_time = current_log.start_time
+            past_log = current_log
+            self.logs.append(past_log)
