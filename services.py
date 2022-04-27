@@ -56,6 +56,7 @@ class DailyLogRow:
         for key, value in mapping.items():
             if key in description.lower():
                 return value
+        return 'Tasks'
 
     def _parse_date(self, date):
         return parse(date)

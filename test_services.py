@@ -40,7 +40,8 @@ class TestDailyLogRow:
         ('Pairing on Other Source Setting up', 'Pairing'),
         ('New Feature on Center discussing', 'Discussion'),
         ('Compose daily Report', 'Daily Works'),
-        ('take a break', 'Break')
+        ('take a break', 'Break'),
+        ('not exist category', 'Tasks')
 
     ])
     def test_get_category(self, test_input, expected):
