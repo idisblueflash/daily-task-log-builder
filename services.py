@@ -67,6 +67,17 @@ class DailyLogRow:
         persons = f'{self.person} {persons}'.split(' ')
         return ', '.join(persons)
 
+    def _get_time(self):
+        if self.end_time is None:
+            return f'{self._get_simple_time(self.start_time)} - ?'
+
+        return f'{self._get_simple_time(self.start_time)} - {self._get_simple_time(self.end_time)}'
+
+    @staticmethod
+    def _get_simple_time(time: timedelta) -> str:
+        digits = str(time).split(':')
+        return ':'.join(digits[:2])
+
 
 class FlashDailyLogRow(DailyLogRow):
     person = 'Flash'

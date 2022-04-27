@@ -63,6 +63,17 @@ class TestDailyLogRow:
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('') == 'Flash'
 
+    def test_get_default_time(self):
+        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row.parse()
+        assert row._get_time() == '7:30 - ?'
+
+    def test_get_time(self):
+        row = DailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row.parse()
+        row.end_time = timedelta(hours=10)
+        assert row._get_time() == '7:30 - 10:00'
+
     def test_get_person_with_one(self):
         row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('Serge') == 'Flash, Serge'
