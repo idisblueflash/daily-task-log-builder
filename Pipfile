@@ -5,6 +5,8 @@ python_version = '3.9'
 requests = "*"
 pandas = "*"
 tabulate = "*"
+openpyxl = "*"
+xlsxwriter = "*"
 
 [dev-packages]
 pytest = "*"

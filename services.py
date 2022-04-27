@@ -17,7 +17,7 @@ class DailyLogRow:
         self.end_time = None
         self.description = None
         self.status = 'DONE'
-        self.date = self._parse_date(date)
+        self.date = date
         self.day = None
 
     def parse(self):
@@ -36,7 +36,7 @@ class DailyLogRow:
 
         self.description = description.strip()
 
-        self.day = calendar.day_abbr[self.date.weekday()]
+        self.day = calendar.day_abbr[parse(self.date).weekday()]
         self.persons = self._get_person(persons)
         self.category = self._get_category(self.description)
         self.priority = self._get_priority(self.description)
@@ -133,17 +133,29 @@ class DailyLog:
         self.total_hours += hours
         return self.total_hours
 
-
     def report(self):
-        headers = ['Date', 'Day', 'Persons Involved',
-                   'Time', 'Category', 'Priority', 'Description',
-                   'Estimate Hours', 'Total Hours', 'Status']
+        headers = ['Date 日期', 'Day', 'Persons Involved',
+                   'Time 时间', 'Category 工作列别', 'Priority 重要性', 'Description 内容描述',
+                   'Estimate Hours', 'Total Hours', 'Status 完成状态']
         table = [[log.date, log.day, log.persons,
                   log._get_time(), log.category, log.priority, log.description,
                   log._get_duration(), self._get_total_hours(log._get_duration()), log.status]
                  for log in self.logs]
         print('')
         print(tabulate(table, headers=headers))
+
+        import pandas as pd
+
+        writer = pd.ExcelWriter('output.xlsx', engine='xlsxwriter')
+        df = pd.DataFrame(table, columns=headers)
+        df.to_excel(writer, sheet_name='Daily Task Log')
+        for column in df:
+            column_width = max(df[column].astype(str).map(len).max(), len(column))
+            column_index = df.columns.get_loc(column) + 1
+            worksheet = writer.sheets['Daily Task Log']
+            worksheet.set_column(column_index, column_index, column_width)
+
+        writer.save()
 
 
 class FlashDailyLog(DailyLog):
