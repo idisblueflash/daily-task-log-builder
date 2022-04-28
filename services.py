@@ -142,21 +142,76 @@ class DailyLog:
         self.total_hours += hours
         return self.total_hours
 
+    def _get_table(self):
+        return [[log.date, log.day, log.persons,
+                 log._get_time(), log.category, log.priority, log.description,
+                 log._get_duration(), self._get_total_hours(log._get_duration()), log.status]
+                for log in self.logs]
+
     def report(self):
         headers = ['Date 日期', 'Day', 'Persons Involved',
                    'Time 时间', 'Category 工作列别', 'Priority 重要性', 'Description 内容描述',
                    'Estimate Hours', 'Total Hours', 'Status 完成状态']
-        table = [[log.date, log.day, log.persons,
-                  log._get_time(), log.category, log.priority, log.description,
-                  log._get_duration(), self._get_total_hours(log._get_duration()), log.status]
-                 for log in self.logs]
+        table = self._get_table()
         print('')
         print(tabulate(table, headers=headers))
 
+
+class FlashDailyLog(DailyLog):
+    log_class = FlashDailyLogRow
+
+
+class LogReader:
+    logs = []
+    log_class = None
+    file_name = None
+    data = {}
+
+    def parse(self):
+        self._parse_file()
+        self._parse_logs()
+
+    def _get_lines(self):
+        with open(self.file_name, encoding='utf-8') as log_file:
+            lines = [line for line in log_file]
+
+        return lines
+
+    def _parse_file(self):
+        current_key = None
+        for line in self._get_lines():
+            if line.startswith('#'):
+                current_key = self._parse_title(line)
+                self.data[current_key] = []
+                continue
+            if current_key:
+                self.data[current_key].append(line.strip())
+
+    def _parse_title(self, line):
+        return line.replace('#', '', 1).strip()
+
+    def _parse_logs(self):
+        if self.log_class is None:
+            raise Exception('You must assign log_class')
+
+        for key in self.data.keys():
+            service = self.log_class(key, self.data[key])
+            service.handle()
+            self.logs = self.logs + service._get_table()
+
+    def _get_headers(self):
+        return ['Date 日期', 'Day', 'Persons Involved',
+                'Time 时间', 'Category 工作列别', 'Priority 重要性', 'Description 内容描述',
+                'Estimate Hours', 'Total Hours', 'Status 完成状态']
+
+    def report(self):
+        print(tabulate(self.logs, headers=self._get_headers()))
+
+    def save_excel(self):
         import pandas as pd
 
         writer = pd.ExcelWriter('output.xlsx', engine='xlsxwriter')
-        df = pd.DataFrame(table, columns=headers)
+        df = pd.DataFrame(self.logs, columns=self._get_headers())
         df.to_excel(writer, sheet_name='Daily Task Log')
         for column in df:
             column_width = max(df[column].astype(str).map(len).max(), len(column))
@@ -169,5 +224,6 @@ class DailyLog:
         writer.save()
 
 
-class FlashDailyLog(DailyLog):
-    log_class = FlashDailyLogRow
+class FlashLogReader(LogReader):
+    log_class = FlashDailyLog
+    file_name = 'data/flash.md'

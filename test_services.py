@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 import pytest
 
-from services import DailyLogRow, DailyLog, FlashDailyLogRow, FlashDailyLog
+from services import DailyLogRow, DailyLog, FlashDailyLogRow, FlashDailyLog, LogReader
 
 
 class TestDailyLogRow:
@@ -132,3 +132,42 @@ class TestDailyLog:
         service = self.get_service()
         service.handle()
         service.report()
+
+
+class TestLogReader:
+    def get_reader(self):
+        class StubLogReader(LogReader):
+            def _get_lines(self):
+                return [
+                    '# 27/Apr/22\n',
+                    '8:00, foo',
+                    '8:30, bar',
+                    '9:00, break'
+                    '\n',
+                    '# 26/Apr/22\n',
+                    '8:00, daily warms up: * email * zulip * planning\n',
+                    '8:30, #8280 AI Recommend by email is broken: * setup up debug tools\n',
+                    '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen\n'
+                ]
+
+        reader = StubLogReader('data/flash.md')
+        reader._parse_file()
+        return reader
+
+    def test_parse_title(self):
+        reader = self.get_reader()
+        assert list(reader.data.keys())[0] == '27/Apr/22'
+
+    def test_parse_logs(self):
+        reader = self.get_reader()
+        assert list(reader.data.values())[0] == ['8:00, foo', '8:30, bar', '9:00, break']
+
+    def test_parse_second_title(self):
+        reader = self.get_reader()
+        assert list(reader.data.keys())[1] == '26/Apr/22'
+
+    def test_parse_second_logs(self):
+        reader = self.get_reader()
+        assert list(reader.data.values())[1] == ['8:00, daily warms up: * email * zulip * planning',
+                                                 '8:30, #8280 AI Recommend by email is broken: * setup up debug tools',
+                                                 '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen']
