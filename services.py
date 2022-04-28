@@ -226,6 +226,15 @@ class LogReader:
 
         writer.save()
 
+    def print_email(self):
+        date, day, name = self.logs[0][:3]
+        print(f"""Subject:
+{name}'s Daily Task Log for {day} {date}
+  
+Hi Nash,
+
+    Please take a look at my daily logs.""")
+
 
 class FlashLogReader(LogReader):
     log_class = FlashDailyLog
