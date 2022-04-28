@@ -227,3 +227,8 @@ class LogReader:
 class FlashLogReader(LogReader):
     log_class = FlashDailyLog
     file_name = 'data/flash.md'
+
+
+class FlashDemoLogReader(LogReader):
+    log_class = FlashDailyLog
+    file_name = 'data/flash.sample.md'

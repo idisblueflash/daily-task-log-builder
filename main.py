@@ -1,7 +1,7 @@
-from services import FlashLogReader
+from services import FlashDemoLogReader
 
 if __name__ == '__main__':
-    reader = FlashLogReader()
+    reader = FlashDemoLogReader()
     reader.parse()
     reader.report()
     reader.save_excel()

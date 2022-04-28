@@ -1,3 +1,5 @@
 output.xlsx
 .idea
 .DS_Store
+data/flash.md
+flash.py
