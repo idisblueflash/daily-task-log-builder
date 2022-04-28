@@ -137,6 +137,8 @@ class TestDailyLog:
 class TestLogReader:
     def get_reader(self):
         class StubLogReader(LogReader):
+            file_name = 'data/flash.sample.md'
+
             def _get_lines(self):
                 return [
                     '# 27/Apr/22\n',
@@ -150,7 +152,7 @@ class TestLogReader:
                     '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen\n'
                 ]
 
-        reader = StubLogReader('data/flash.md')
+        reader = StubLogReader()
         reader._parse_file()
         return reader
 
