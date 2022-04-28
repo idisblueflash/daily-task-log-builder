@@ -166,6 +166,7 @@ class LogReader:
     log_class = None
     file_name = None
     data = {}
+    daily = True
 
     def parse(self):
         self._parse_file()
@@ -198,6 +199,8 @@ class LogReader:
             service = self.log_class(key, self.data[key])
             service.handle()
             self.logs = self.logs + service._get_table()
+            if self.daily:
+                break
 
     def _get_headers(self):
         return ['Date 日期', 'Day', 'Persons Involved',
