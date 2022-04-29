@@ -182,11 +182,28 @@ class LogReader:
         current_key = None
         for line in self._get_lines():
             if line.startswith('#'):
-                current_key = self._parse_title(line)
-                self.data[current_key] = []
+                current_key = self._initial_log_key(line)
                 continue
             if current_key:
-                self.data[current_key].append(line.strip())
+                self._add_line_by_key(current_key, line)
+
+    def _initial_log_key(self, line):
+        key = self._parse_title(line)
+        self.data[key] = []
+        return key
+
+    @staticmethod
+    def _has_started_with_time(line):
+        hour_data = line.split(':')[0]
+        return hour_data.isnumeric()
+
+    def _add_line_by_key(self, key, line):
+        if self._has_started_with_time(line):
+            self.data[key].append(line.strip())
+        else:
+            last_line = self.data[key].pop()
+            last_line = f'{last_line}\n{line}'
+            self.data[key].append(last_line.strip())
 
     def _parse_title(self, line):
         return line.replace('#', '', 1).strip()

@@ -149,7 +149,12 @@ class TestLogReader:
                     '# 26/Apr/22\n',
                     '8:00, daily warms up: * email * zulip * planning\n',
                     '8:30, #8280 AI Recommend by email is broken: * setup up debug tools\n',
-                    '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen\n'
+                    '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen\n',
+                    '# 25/Apr/22\n',
+                    '8:00, daily warms up',
+                    '  * email',
+                    '  * zulip',
+                    '8:30, tasks'
                 ]
 
         reader = StubLogReader()
@@ -173,3 +178,16 @@ class TestLogReader:
         assert list(reader.data.values())[1] == ['8:00, daily warms up: * email * zulip * planning',
                                                  '8:30, #8280 AI Recommend by email is broken: * setup up debug tools',
                                                  '9:19, Wrong Ask Formatting Emails Issue: communicate with Helen']
+
+    def test_parse_multiple_lines(self):
+        reader = self.get_reader()
+        assert list(reader.data.values())[2] == ['8:00, daily warms up\n  * email\n  * zulip',
+                                                 '8:30, tasks']
+
+    def test_stared_with_time(self):
+        reader = self.get_reader()
+        assert reader._has_started_with_time('8:00, task')
+
+    def test_not_stared_with_time(self):
+        reader = self.get_reader()
+        assert not reader._has_started_with_time('  * task')
