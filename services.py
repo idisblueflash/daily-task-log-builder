@@ -206,6 +206,8 @@ class LogReader:
         if self._has_started_with_time(line):
             self.data[key].append(line.strip())
         else:
+            if len(self.data[key]) == 0:
+                raise Exception(f'Empty list in data {self.data} with key {key}')
             last_line = self.data[key].pop()
             last_line = f'{last_line}\n{line}'
             self.data[key].append(last_line.strip())
