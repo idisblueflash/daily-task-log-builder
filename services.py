@@ -30,6 +30,8 @@ class DailyLogRow:
             start_time, description, persons = columns
         if len(columns) == 2:
             start_time, description = columns
+        if start_time is None:
+            raise Exception(f'None start time found:\n {self.date} \n columns= {columns}')
         start_time = start_time.strip()
         hour, minute = start_time.split(':')
         self.start_time = timedelta(hours=int(hour), minutes=int(minute))
@@ -168,6 +170,9 @@ class LogReader:
     data = {}
     daily = True
 
+    def __init__(self, file_name):
+        self.file_name = file_name
+
     def parse(self):
         self._parse_file()
         self._parse_logs()
@@ -255,9 +260,8 @@ Hi Nash,
 
 class FlashLogReader(LogReader):
     log_class = FlashDailyLog
-    file_name = 'data/flash.md'
+    file_name = 'demo.md'
 
 
-class FlashDemoLogReader(LogReader):
+class DemoLogReader(LogReader):
     log_class = FlashDailyLog
-    file_name = 'data/flash.sample.md'
