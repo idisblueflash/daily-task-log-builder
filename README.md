@@ -28,7 +28,7 @@ Assume you wrote a log file called `demo.md`
 ```
 you can generate it with
 ```shell
-$ pipenv run python make_report.py demo.md
+$ pipenv run ./make_report.py demo.md
 Date 日期    Day    Persons Involved    Time 时间        Category 工作列别    Priority 重要性    Description 内容描述                         Estimate Hours    Total Hours  Status 完成状态
 ---------  -----  ------------------  -------------  ---------------  --------------  -------------------------------------  ----------------  -------------  -------------
 27/Apr/22  Wed    Flash               8:00 - 8:30    Daily Works      Low             daily warms up                                     0.5            0.5   DONE
@@ -44,7 +44,7 @@ Date 日期    Day    Persons Involved    Time 时间        Category 工作列�
 ```
 ## Helps
 ```shell
-python make_report.py --help
+./make_report.py --help
 Usage: make_report.py [OPTIONS] FILE_NAME
 
 Options:
