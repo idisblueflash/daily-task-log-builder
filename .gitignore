@@ -4,3 +4,4 @@ output.xlsx
 data/flash.md
 flash.py
 data/
+.env

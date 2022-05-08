@@ -10,7 +10,12 @@ pipenv install
 ```
 
 ## A Simple Example
-Assume you wrote a log file called `demo.md`
+1. configure your username in `.env` file
+```shell
+USER_NAME=flash
+```
+
+2. Assume you wrote a log file called `demo.md`
 ```md
 # 27/Apr/22
 8:00, daily warms up: 
@@ -26,7 +31,7 @@ Assume you wrote a log file called `demo.md`
 10:00, daily, Nash Chase
 12:00, break
 ```
-you can generate it with
+3. you can generate it with
 ```shell
 $ pipenv run ./make_report.py demo.md
 Date 日期    Day    Persons Involved    Time 时间        Category 工作列别    Priority 重要性    Description 内容描述                         Estimate Hours    Total Hours  Status 完成状态

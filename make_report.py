@@ -2,7 +2,7 @@
 
 import click
 
-from services import DemoLogReader
+from services import LogReader
 
 
 @click.command()
@@ -11,7 +11,7 @@ from services import DemoLogReader
 @click.option('--email', default=False, help='Show email messages')
 @click.option('--excel', default=False, help='generate execle output file')
 def make(file_name, daily, email, excel):
-    reader = DemoLogReader(file_name)
+    reader = LogReader(file_name)
     reader.daily = daily
     reader.parse()
     reader.report()
@@ -23,3 +23,4 @@ def make(file_name, daily, email, excel):
 
 if __name__ == '__main__':
     make()
+

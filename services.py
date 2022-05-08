@@ -1,3 +1,4 @@
+import os
 import calendar
 from datetime import timedelta
 from typing import List
@@ -5,8 +6,10 @@ from typing import List
 from dateutil.parser import parse
 from tabulate import tabulate
 
+user_name = os.environ.get('USER_NAME', 'DefaultName')
 
-class DailyLogRow:
+
+class BaseDailyLogRow:
     person = None
 
     def __init__(self, row, date):
@@ -101,8 +104,8 @@ class DailyLogRow:
         return result
 
 
-class FlashDailyLogRow(DailyLogRow):
-    person = 'Flash'
+class DefaultDailyLogRow(BaseDailyLogRow):
+    person = user_name
 
     @classmethod
     def _get_priority(cls, description):
@@ -119,8 +122,8 @@ class FlashDailyLogRow(DailyLogRow):
         return 'Medium'
 
 
-class DailyLog:
-    log_class = None
+class DefaultDailyLog:
+    log_class = DefaultDailyLogRow
 
     def __init__(self, date: str, rows: List[str]):
         self.total_hours = 0
@@ -159,13 +162,9 @@ class DailyLog:
         print(tabulate(table, headers=headers))
 
 
-class FlashDailyLog(DailyLog):
-    log_class = FlashDailyLogRow
-
-
 class LogReader:
     logs = []
-    log_class = None
+    log_class = DefaultDailyLog
     file_name = None
     data = {}
     daily = True
@@ -258,12 +257,3 @@ class LogReader:
 Hi Nash,
 
     Please take a look at my daily logs.""")
-
-
-class FlashLogReader(LogReader):
-    log_class = FlashDailyLog
-    file_name = 'demo.md'
-
-
-class DemoLogReader(LogReader):
-    log_class = FlashDailyLog

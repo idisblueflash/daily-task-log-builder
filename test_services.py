@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 import pytest
 
-from services import DailyLogRow, DailyLog, FlashDailyLogRow, FlashDailyLog, LogReader
+from services import BaseDailyLogRow, DefaultDailyLogRow, LogReader, DefaultDailyLog
 
 
 class TestDailyLogRow:
@@ -11,7 +11,7 @@ class TestDailyLogRow:
     DATE = '25/Apr/22'
 
     def get_service(self):
-        service = FlashDailyLogRow(self.ROW_DATA, self.DATE)
+        service = DefaultDailyLogRow(self.ROW_DATA, self.DATE)
         service.parse()
         return service
 
@@ -24,7 +24,7 @@ class TestDailyLogRow:
         assert row.description == 'AI recommendation investigate on Kourosh'
 
     def test_parse_description_with_sublines(self):
-        service = FlashDailyLogRow(self.SUBLINE_ROW_DATA, self.DATE)
+        service = DefaultDailyLogRow(self.SUBLINE_ROW_DATA, self.DATE)
         service.parse()
         assert service.description == 'AI recommendation investigate on Kourosh\n  * foo\n  * bar'
 
@@ -45,7 +45,7 @@ class TestDailyLogRow:
 
     ])
     def test_get_category(self, test_input, expected):
-        result = DailyLogRow._get_category(test_input)
+        result = BaseDailyLogRow._get_category(test_input)
         assert result == expected
 
     def test_get_date(self):
@@ -70,8 +70,14 @@ class TestDailyLogRow:
         row.end_time = timedelta(hours=8, minutes=19)
         assert row._get_duration() == 0.82
 
+    def build_daily_log_row(self, *args):
+        class StubDefaultDailyLogRow(DefaultDailyLogRow):
+            person = 'Flash'
+
+        return StubDefaultDailyLogRow(*args)
+
     def test_get_default_person(self):
-        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('') == 'Flash'
 
     def test_get_default_time(self):
@@ -84,15 +90,15 @@ class TestDailyLogRow:
         assert row._get_time() == '7:30 - 10:00'
 
     def test_get_person_with_one(self):
-        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('Serge') == 'Flash, Serge'
 
     def test_get_person_with_one_and_space(self):
-        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
         assert row._get_person(' Serge') == 'Flash, Serge'
 
     def test_get_person_with_more(self):
-        row = FlashDailyLogRow(self.ROW_DATA, '26/Apr/22')
+        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
         assert row._get_person('Serge Kimi') == 'Flash, Serge, Kimi'
 
     @pytest.mark.parametrize('test_input, expected', [
@@ -107,7 +113,7 @@ class TestDailyLogRow:
 
     ])
     def test_get_priority(self, test_input, expected):
-        result = FlashDailyLogRow._get_priority(test_input)
+        result = DefaultDailyLogRow._get_priority(test_input)
         assert result == expected
 
 
@@ -116,7 +122,7 @@ class TestDailyLog:
         data = ['7:30, AI recommendation investigate on Kourosh',
                 '10:00, DevOps Daily Meeting, Serge',
                 '12:00, break']
-        return FlashDailyLog('26/Apr/22', data)
+        return DefaultDailyLog('26/Apr/22', data)
 
     def test_set_end_time(self):
         service = self.get_service()
@@ -137,7 +143,7 @@ class TestDailyLog:
 class TestLogReader:
     def get_reader(self):
         class StubLogReader(LogReader):
-            file_name = 'data/flash.sample.md'
+            file_name = 'demo.md'
 
             def _get_lines(self):
                 return [
@@ -157,7 +163,7 @@ class TestLogReader:
                     '8:30, tasks'
                 ]
 
-        reader = StubLogReader()
+        reader = StubLogReader(None)
         reader._parse_file()
         return reader
 
