@@ -113,7 +113,7 @@ class TestDailyLogRow:
 
     ])
     def test_get_priority(self, test_input, expected):
-        result = DefaultDailyLogRow._get_priority(test_input)
+        result = DefaultDailyLogRow(None, None)._get_priority(test_input)
         assert result == expected
 
 

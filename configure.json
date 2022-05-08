@@ -1,0 +1,18 @@
+{
+  "category": {
+    "investigat": "Investigation",
+    "meet": "Communication",
+    "communicat": "Communication",
+    "discus": "Discussion",
+    "pair": "Pairing",
+    "daily": "Daily Works",
+    "break": "Break",
+    "note32ab6": "the order of key-value matters, the higher the first selected out"
+  },
+  "priority": {
+    "ai recom": "High",
+    "devops": "Medium",
+    "daily": "Low",
+    "break": "Low"
+  }
+}

@@ -1,4 +1,5 @@
 import os
+import json
 import calendar
 from datetime import timedelta
 from typing import List
@@ -7,6 +8,9 @@ from dateutil.parser import parse
 from tabulate import tabulate
 
 user_name = os.environ.get('USER_NAME', 'DefaultName')
+
+with open('configure.json') as f:
+    configure = json.load(f)
 
 
 class BaseDailyLogRow:
@@ -48,17 +52,8 @@ class BaseDailyLogRow:
 
     @classmethod
     def _get_category(cls, description):
-        mapping = {
-            'investigat': 'Investigation',
-            'meet': 'Communication',
-            'communicat': 'Communication',
-            'discus': 'Discussion',
-            'pair': 'Pairing',
-            'daily': 'Daily Works',
-            'break': 'Break',
-        }  # the order of key-value matters, the higher the first selected out
 
-        for key, value in mapping.items():
+        for key, value in configure.get('category').items():
             if key in description.lower():
                 return value
         return 'Tasks'
@@ -95,7 +90,8 @@ class BaseDailyLogRow:
     def _get_priority(cls, description):
         raise NotImplementedError
 
-    def _get_description(self, data):
+    @staticmethod
+    def _get_description(data):
         if ':' not in data:
             return data
         main, sub_line_data = data.split(':')
@@ -107,16 +103,8 @@ class BaseDailyLogRow:
 class DefaultDailyLogRow(BaseDailyLogRow):
     person = user_name
 
-    @classmethod
-    def _get_priority(cls, description):
-        mapping = {
-            'ai recom': 'High',
-            'devops': 'Medium',
-            'daily': 'Low',
-            'break': 'Low'
-        }
-
-        for key, value in mapping.items():
+    def _get_priority(self, description):
+        for key, value in configure.get('priority').items():
             if key in description.lower():
                 return value
         return 'Medium'
