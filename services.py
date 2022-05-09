@@ -8,16 +8,16 @@ import spacy
 from dateutil.parser import parse
 from tabulate import tabulate
 
-user_name = os.environ.get('USER_NAME', 'DefaultName')
 
 with open('configure.json') as f:
     configure = json.load(f)
 
 
 class BaseDailyLogRow:
-    person = None
+    person = configure.get('user_name')
 
     def __init__(self, row, date):
+        self.persons_involved = None
         self.priority = None
         self.category = None
         self.row = row
@@ -29,7 +29,6 @@ class BaseDailyLogRow:
         self.day = None
 
     def parse(self):
-        persons = ''
         doc =self._get_nlp_result_doc()
         start_time = self._get_start_time(doc)
         if start_time is None:
@@ -40,7 +39,7 @@ class BaseDailyLogRow:
         self.description = self._get_description(doc)
 
         self.day = calendar.day_abbr[parse(self.date).weekday()]
-        self.persons = self._get_person(persons)
+        self.persons_involved = self._get_persons_involed(doc)
         self.category = self._get_category(self.description)
         self.priority = self._get_priority(self.description)
 
@@ -62,12 +61,12 @@ class BaseDailyLogRow:
         duration = self.end_time - self.start_time
         return round(duration.seconds / 3600, 2)
 
-    def _get_person(self, persons: str):
-        persons = persons.strip()
-        if persons == '':
-            return self.person
-        people = f'{self.person} {persons}'.split(' ')
-        return ', '.join(people)
+    def _get_persons_involed(self, doc):
+        propns =  [self.person] + [token.text for token in doc if token.pos_ == 'PROPN']
+
+        members = list(set([name for name in propns if name in configure.get('team_members', [])]))
+
+        return ', '.join(sorted(members))
 
     def _get_time(self):
         if self.end_time is None:
@@ -100,7 +99,6 @@ class BaseDailyLogRow:
 
 
 class DefaultDailyLogRow(BaseDailyLogRow):
-    person = user_name
 
     def _get_priority(self, description):
         for key, value in configure.get('priority').items():
@@ -135,7 +133,7 @@ class DefaultDailyLog:
         return self.total_hours
 
     def _get_table(self):
-        return [[log.date, log.day, log.persons,
+        return [[log.date, log.day, log.persons_involved,
                  log._get_time(), log.category, log.priority, log.description,
                  log._get_duration(), self._get_total_hours(log._get_duration()), log.status]
                 for log in self.logs]

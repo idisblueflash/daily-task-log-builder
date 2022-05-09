@@ -1,6 +1,8 @@
 {
+  "user_name": "Flash",
   "category": {
     "investigat": "Investigation",
+    "understand": "Investigation",
     "meet": "Communication",
     "communicat": "Communication",
     "discus": "Discussion",
@@ -14,5 +16,15 @@
     "devops": "Medium",
     "daily": "Low",
     "break": "Low"
-  }
+  },
+  "team_members": [
+    "Flash",
+    "Serge",
+    "Nash",
+    "Kimi",
+    "Chase",
+    "Leo",
+    "Vincent",
+    "Eric"
+  ]
 }

@@ -1,5 +1,6 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 import pytest
+import spacy
 
 from services import BaseDailyLogRow, DefaultDailyLogRow, LogReader, DefaultDailyLog
 
@@ -71,10 +72,6 @@ class TestDailyLogRow:
 
         return StubDefaultDailyLogRow(*args)
 
-    def test_get_default_person(self):
-        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
-        assert row._get_person('') == 'Flash'
-
     def test_get_default_time(self):
         row = self.get_service()
         assert row._get_time() == '7:30 - ?'
@@ -86,15 +83,15 @@ class TestDailyLogRow:
 
     def test_get_person_with_one(self):
         row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
-        assert row._get_person('Serge') == 'Flash, Serge'
-
-    def test_get_person_with_one_and_space(self):
-        row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
-        assert row._get_person(' Serge') == 'Flash, Serge'
+        nlp = spacy.load('en_core_web_sm')
+        doc = nlp('7:30 AI recommendation investigate with Serge')
+        assert row._get_persons_involed(doc) == 'Flash, Serge'
 
     def test_get_person_with_more(self):
         row = self.build_daily_log_row(self.ROW_DATA, '26/Apr/22')
-        assert row._get_person('Serge Kimi') == 'Flash, Serge, Kimi'
+        nlp = spacy.load('en_core_web_sm')
+        doc = nlp('7:30 AI recommendation investigate with Serge and Kimi')
+        assert row._get_persons_involed(doc) == 'Flash, Kimi, Serge'
 
     @pytest.mark.parametrize('test_input, expected', [
         ('AI recommendation investigate on Kourosh', 'High'),
