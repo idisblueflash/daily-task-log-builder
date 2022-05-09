@@ -4,6 +4,7 @@ import calendar
 from datetime import timedelta
 from typing import List
 
+import spacy
 from dateutil.parser import parse
 from tabulate import tabulate
 
@@ -28,22 +29,15 @@ class BaseDailyLogRow:
         self.day = None
 
     def parse(self):
-        columns = self.row.split(',')
         persons = ''
-        start_time = None
-        description = None
-
-        if len(columns) == 3:
-            start_time, description, persons = columns
-        if len(columns) == 2:
-            start_time, description = columns
+        doc =self._get_nlp_result_doc()
+        start_time = self._get_start_time(doc)
         if start_time is None:
-            raise Exception(f'None start time found:\n {self.date} \n columns= {columns}')
-        start_time = start_time.strip()
+            raise Exception(f'None start time found: in {self.row}')
         hour, minute = start_time.split(':')
         self.start_time = timedelta(hours=int(hour), minutes=int(minute))
 
-        self.description = self._get_description(description.strip())
+        self.description = self._get_description(doc)
 
         self.day = calendar.day_abbr[parse(self.date).weekday()]
         self.persons = self._get_person(persons)
@@ -90,14 +84,19 @@ class BaseDailyLogRow:
     def _get_priority(cls, description):
         raise NotImplementedError
 
-    @staticmethod
-    def _get_description(data):
-        if ':' not in data:
-            return data
-        main, sub_line_data = data.split(':')
-        sub_lines = [line.strip() for line in sub_line_data.split('*')]
-        result = f'{main}' + '\n  * ' + '\n  * '.join([line for line in sub_lines if line != ''])
-        return result
+    def _get_description(self, doc):
+        start_time = self._get_start_time(doc)
+        if start_time:
+            return doc.text.replace(start_time, '').strip()
+
+    def _get_nlp_result_doc(self):
+        nlp = spacy.load('en_core_web_sm')
+        return nlp(self.row)
+
+    def _get_start_time(self, doc):
+        first_token = doc[0]
+        if first_token.tag_ == 'CD' and first_token.pos_ == 'NUM':
+            return first_token.text
 
 
 class DefaultDailyLogRow(BaseDailyLogRow):

@@ -8,6 +8,8 @@ tabulate = "*"
 openpyxl = "*"
 xlsxwriter = "*"
 click = "*"
+spacy = "*"
+ipython = "*"
 
 [dev-packages]
 pytest = "*"
