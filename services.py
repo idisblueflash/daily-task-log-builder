@@ -8,6 +8,7 @@ import spacy
 from dateutil.parser import parse
 from tabulate import tabulate
 
+from email_services import send_email
 
 with open('configure.json') as f:
     configure = json.load(f)
@@ -236,9 +237,5 @@ class LogReader:
 
     def print_email(self):
         date, day, name = self.logs[0][:3]
-        print(f"""Subject:
-{name}'s Daily Task Log for {day} {date}
-  
-Hi Nash,
-
-    Please take a look at my daily logs.""")
+        subject = f"{name}'s Daily Task Log for {day} {date}"
+        send_email(subject)
