@@ -18,7 +18,6 @@ pipenv install
 2. Assume you wrote a log file called `demo.md`
 ```md
 # 27/Apr/22
-# 27/Apr/22
 8:00 day-to-day communication work and planning
 8:30 #8280 AI Recommend by email is broken
   * setup up debug tools
