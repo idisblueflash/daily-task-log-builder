@@ -57,3 +57,17 @@ Options:
   --excel BOOLEAN  generate execle output file
   --help           Show this message and exit.
 ```
+
+## Configure Email Service
+you can add a `.env` file to save your email settings like:
+```md
+SMTP_SERVER=smtp.partner.outlook.cn
+PORT=587
+EMAIL_SENDER=flash@cgptalent.com
+EMAIL_PASSWORD=yourEmailPassword
+EMAIL_TO=foo@icloud.com
+EMAIL_CC=foo@gmail.com,bar@gmail.com
+BODY='Hi Tom,
+    Please take a look at my daily logs.'
+
+```
