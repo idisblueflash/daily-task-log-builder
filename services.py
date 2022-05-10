@@ -234,6 +234,7 @@ class LogReader:
             worksheet.set_column(column_index, column_index, column_width)
 
         writer.save()
+        os.system('open ./output.xlsx')
 
     def print_email(self):
         date, day, name = self.logs[0][:3]
