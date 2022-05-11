@@ -4,6 +4,7 @@
     "investigat": "Investigation",
     "understand": "Investigation",
     "meet": "Communication",
+    "bug": "Bug Fixing",
     "communicat": "Communication",
     "discus": "Discussion",
     "pair": "Pairing",
@@ -13,6 +14,7 @@
   },
   "priority": {
     "ai recom": "High",
+    "bug": "High",
     "devops": "Medium",
     "daily": "Low",
     "break": "Low"
