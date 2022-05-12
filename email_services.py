@@ -1,4 +1,3 @@
-import datetime
 import os
 import smtplib, ssl
 
@@ -22,6 +21,7 @@ def send_email(subject):
     message['To'] = receiver_email
     message['Subject'] = subject
     message['CC'] = cc_email
+    receiver_emails = [receiver_email] + cc_email.split(',')
 
     message.attach(MIMEText(body, 'plain'))
     filename = 'output.xlsx'
@@ -51,7 +51,7 @@ def send_email(subject):
         server.ehlo()
         server.login(sender_email, password)
 
-        server.sendmail(sender_email, receiver_email, text)
+        server.sendmail(sender_email, receiver_emails, text)
     except Exception as e:
         print(e)
     finally:
