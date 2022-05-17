@@ -52,6 +52,17 @@ class TestDailyLogRow:
         row = self.get_service()
         assert row.day == 'Mon'
 
+    def test_get_default_status(self):
+        service = DefaultDailyLogRow(self.ROW_DATA, self.DATE)
+        service.parse()
+        assert service.status == 'DONE'
+
+    def test_get_WIP_status(self):
+        data = f'{self.ROW_DATA}\n  * foo\n  - bar'
+        service = DefaultDailyLogRow(data, self.DATE)
+        service.parse()
+        assert service.status == 'WIP'
+
     def test_get_default_duration(self):
         row = self.get_service()
         assert row._get_duration() == 0

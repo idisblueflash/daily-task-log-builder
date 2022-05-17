@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import calendar
 from datetime import timedelta
@@ -30,7 +31,7 @@ class BaseDailyLogRow:
         self.day = None
 
     def parse(self):
-        doc =self._get_nlp_result_doc()
+        doc = self._get_nlp_result_doc()
         start_time = self._get_start_time(doc)
         if start_time is None:
             raise Exception(f'None start time found: in {self.row}')
@@ -43,6 +44,7 @@ class BaseDailyLogRow:
         self.persons_involved = self._get_persons_involed(doc)
         self.category = self._get_category(self.description)
         self.priority = self._get_priority(self.description)
+        self.status = self._get_status(self.description)
 
     @classmethod
     def _get_category(cls, description):
@@ -63,7 +65,7 @@ class BaseDailyLogRow:
         return round(duration.seconds / 3600, 2)
 
     def _get_persons_involed(self, doc):
-        propns =  [self.person] + [token.text for token in doc if token.pos_ == 'PROPN']
+        propns = [self.person] + [token.text for token in doc if token.pos_ == 'PROPN']
 
         members = list(set([name for name in propns if name in configure.get('team_members', [])]))
 
@@ -97,6 +99,10 @@ class BaseDailyLogRow:
         first_token = doc[0]
         if first_token.tag_ == 'CD' and first_token.pos_ == 'NUM':
             return first_token.text
+
+    def _get_status(self, description):
+        found = re.findall('\n\ \ ([-])\ ', description)
+        return 'WIP' if len(found) else self.status
 
 
 class DefaultDailyLogRow(BaseDailyLogRow):
