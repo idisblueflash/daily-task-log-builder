@@ -162,7 +162,7 @@ class TestLogReader:
                     '# 25/Apr/22\n',
                     '8:00, daily warms up',
                     '  * email',
-                    '  * zulip',
+                    '  - zulip',
                     '8:30, tasks'
                 ]
 
@@ -190,7 +190,7 @@ class TestLogReader:
 
     def test_parse_multiple_lines(self):
         reader = self.get_reader()
-        assert list(reader.data.values())[2] == ['8:00, daily warms up\n  * email\n  * zulip',
+        assert list(reader.data.values())[2] == ['8:00, daily warms up\n  * email\n  - zulip',
                                                  '8:30, tasks']
 
     def test_stared_with_time(self):
