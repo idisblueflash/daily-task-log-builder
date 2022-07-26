@@ -14,6 +14,7 @@
   },
   "priority": {
     "ai recom": "High",
+    "kpi": "High",
     "bug": "High",
     "devops": "Medium",
     "daily": "Low",

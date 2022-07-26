@@ -123,6 +123,7 @@ class TestDailyLogRow:
 class TestDailyLog:
     def get_service(self):
         data = ['7:30, AI recommendation investigate on Kourosh',
+                '8:30 SendGrid Question Follow up',
                 '10:00, DevOps Daily Meeting, Serge',
                 '12:00, break']
         return DefaultDailyLog('26/Apr/22', data)
@@ -130,12 +131,12 @@ class TestDailyLog:
     def test_set_end_time(self):
         service = self.get_service()
         service.handle()
-        assert service.logs[0].end_time == timedelta(hours=10)
+        assert service.logs[0].end_time == timedelta(hours=8, minutes=30)
 
     def test_remove_break_category(self):
         service = self.get_service()
         service.handle()
-        assert len(service.logs) == 2
+        assert len(service.logs) == 3
 
     def test_report(self):
         service = self.get_service()

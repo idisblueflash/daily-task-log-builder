@@ -97,7 +97,7 @@ class BaseDailyLogRow:
 
     def _get_start_time(self, doc):
         first_token = doc[0]
-        if first_token.tag_ == 'CD' and first_token.pos_ == 'NUM':
+        if first_token.tag_ in ['CD', 'LS'] and first_token.pos_ in ['NUM', 'X']:
             return first_token.text
 
     def _get_status(self, description):
@@ -212,6 +212,8 @@ class LogReader:
 
         for key in self.data.keys():
             service = self.log_class(key, self.data[key])
+
+
             service.handle()
             self.logs = self.logs + service._get_table()
             if self.daily:
